@@ -1,5 +1,5 @@
 {
   "apiPort": 8888,
-  "ReadTimeout": 5000,
-  "WriteTimeout": 5000
+  "readTimeout": 5000,
+  "writeTimeout": 5000
 }

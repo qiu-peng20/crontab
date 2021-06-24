@@ -1,11 +1,14 @@
 package apiServer
 
 import (
+	"crontab/master/config"
 	"fmt"
 	"net"
 	"net/http"
+	"strconv"
 	"time"
 )
+
 type ApiServer struct {
 	httpServer *http.Server
 }
@@ -14,23 +17,23 @@ var (
 	HttpServer *ApiServer
 )
 
-func handleJobSave(rw http.ResponseWriter, rp *http.Request)  {
+func handleJobSave(rw http.ResponseWriter, rp *http.Request) {
 
 }
 
-func InitApiServer() (err error)  {
-	mux :=  http.NewServeMux()
+func InitApiServer() (err error) {
+	mux := http.NewServeMux()
 	mux.HandleFunc("/job/save", handleJobSave)
-	
+
 	//启动http监听
-	listen, err := net.Listen("tcp", ":8888")
+	listen, err := net.Listen("tcp", ":"+strconv.Itoa(config.G_Config.ApiPort))
 	if err != nil {
 		return err
 	}
 	httpServer := &http.Server{
-		ReadTimeout: 5*time.Second,
-		WriteTimeout: 5*time.Second,
-		Handler: mux,
+		ReadTimeout:  time.Duration(config.G_Config.ReadTimeout) * time.Millisecond,
+		WriteTimeout: time.Duration(config.G_Config.WriteTimeout) * time.Millisecond,
+		Handler:      mux,
 	}
 	HttpServer = &ApiServer{
 		httpServer: httpServer,

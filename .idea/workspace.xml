@@ -2,16 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b85e0cca-fb4a-440b-a8d5-9df25238bfac" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/crontab.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/master/apiServer/apiServer.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/master/config/config.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/master/config/config.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/master/main/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/master/apiServer/apiServer.go" beforeDir="false" afterPath="$PROJECT_DIR$/master/apiServer/apiServer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/master/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/master/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/master/config/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/master/config/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/master/main/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/master/main/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,6 +116,11 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/master" />
+    </key>
   </component>
   <component name="RunManager" selected="Go 构建.go build crontab/master/main">
     <configuration name="go build crontab/master/main" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
