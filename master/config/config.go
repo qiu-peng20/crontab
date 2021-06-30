@@ -9,6 +9,8 @@ type configData struct {
 	ApiPort int `json:"apiPort"`
 	ReadTimeout int `json:"readTimeout"`
 	WriteTimeout int `json:"writeTimeout"`
+	EtcdEndPoints []string `json:"etcdEndPoints"`
+	EtcdDialTimeOut int `json:"etcdDialTimeOut"`
 }
 
 var G_Config *configData
@@ -16,7 +18,7 @@ var G_Config *configData
 func InitConfig(fileName string)(err error)  {
 	var conf configData
 	file, err := ioutil.ReadFile(fileName)
-	if err != nil {
+	if err !=                                                                                                                                           nil {
 		return err
 	}
 	err = json.Unmarshal(file, &conf)
