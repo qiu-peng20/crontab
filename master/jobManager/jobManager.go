@@ -52,7 +52,7 @@ func (j JobMgr) SaveJob(job common.Job) (oldJob *common.Job, err error) {
 		putResponse *clientv3.PutResponse
 	)
 
-	jobKey = "/cron/job/"
+	jobKey = common.JobSaveUrl + job.Name
 	//任务信息的json，序列化
 	jobValue, err = json.Marshal(job)
 	if err != nil {
@@ -72,6 +72,47 @@ func (j JobMgr) SaveJob(job common.Job) (oldJob *common.Job, err error) {
 			return nil, err
 		}
 		oldJob = &oldJobObj
+	}
+	return
+}
+
+func (j JobMgr)DeleteJob(name string) (oldJob *common.Job, err error)  {
+	var (
+		jobName string
+		response *clientv3.DeleteResponse
+	)
+	jobName = common.JobSaveUrl + name
+	response, err = j.Kv.Delete(context.TODO(), jobName, clientv3.WithPrevKV())
+	if err != nil {
+		return nil, err
+	}
+	if len(response.PrevKvs) != 0 {
+		err = json.Unmarshal(response.PrevKvs[0].Value, &oldJob)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return
+}
+
+func (j JobMgr)FindList()(list []common.Job, err error)  {
+	var (
+		getResponse *clientv3.GetResponse
+		job common.Job
+	)
+	list = make([]common.Job, 0)
+	jobName := common.JobSaveUrl
+	getResponse, err = j.Kv.Get(context.TODO(),jobName,clientv3.WithPrefix())
+	if err != nil {
+		return list, err
+	}
+
+	for _, value := range getResponse.Kvs{
+		err = json.Unmarshal(value.Value, &job)
+		if err != nil {
+			return list, err
+		}
+		list = append(list, job)
 	}
 	return
 }
