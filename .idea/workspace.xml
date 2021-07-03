@@ -2,9 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b85e0cca-fb4a-440b-a8d5-9df25238bfac" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/common/const.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/worker/config/config.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/worker/config/config.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/worker/jobManager/jobManager.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/worker/main/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/const.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/const.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/protocol.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/protocol.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/master/apiServer/apiServer.go" beforeDir="false" afterPath="$PROJECT_DIR$/master/apiServer/apiServer.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/master/jobManager/jobManager.go" beforeDir="false" afterPath="$PROJECT_DIR$/master/jobManager/jobManager.go" afterDir="false" />
     </list>
@@ -105,7 +110,7 @@
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/worker" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -118,11 +123,14 @@
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/worker" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/master" />
     </key>
   </component>
-  <component name="RunManager" selected="Go 构建.go build crontab/master/main">
+  <component name="RunManager" selected="Go 构建.go build crontab/worker/main">
     <configuration name="go build crontab/master/main" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="crontab" />
       <working_directory value="$PROJECT_DIR$" />
@@ -130,6 +138,15 @@
       <package value="crontab/master/main" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/master/main/main.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build crontab/worker/main" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="crontab" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="crontab/worker/main" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/worker/main/main.go" />
       <method v="2" />
     </configuration>
     <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -161,6 +178,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go 构建.go build crontab/worker/main" />
         <item itemvalue="Go 构建.go build crontab/master/main" />
         <item itemvalue="Go 构建.go build main.go" />
         <item itemvalue="Go 构建.go build main.go (1)" />

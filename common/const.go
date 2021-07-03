@@ -1,5 +1,6 @@
 package common
 
 const (
-	JobSaveUrl = "/cron/job"
+	JobSaveUrl = "/cron/job/"
+	JobKillUrl = "/kill/job/"
 )

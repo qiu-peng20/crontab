@@ -23,10 +23,10 @@ var (
 
 func handleJobSave(rw http.ResponseWriter, rq *http.Request) {
 	var (
-		job common.Job
-		err error
-		body []byte
-		oldJob *common.Job
+		job      common.Job
+		err      error
+		body     []byte
+		oldJob   *common.Job
 		response []byte
 	)
 	err = rq.ParseForm()
@@ -58,18 +58,18 @@ func handleJobSave(rw http.ResponseWriter, rq *http.Request) {
 	return
 	//如果失败，返回失败应答
 
-	ERR:
-		response, _ = common.NewResponse(0, "file", nil)
+ERR:
+	response, _ = common.NewResponse(0, "file", nil)
 	_, _ = rw.Write(response)
 }
 
 func handleJobDelete(rw http.ResponseWriter, rq *http.Request) {
 	var (
-		job common.Job
-		err error
-		all []byte
+		job       common.Job
+		err       error
+		all       []byte
 		deleteJob *common.Job
-		response []byte
+		response  []byte
 	)
 	err = rq.ParseForm()
 	if err != nil {
@@ -94,8 +94,8 @@ func handleJobDelete(rw http.ResponseWriter, rq *http.Request) {
 	}
 	_, _ = rw.Write(response)
 	return
-	ERR:
-		response, _ = common.NewResponse(1, "error", nil)
+ERR:
+	response, _ = common.NewResponse(1, "error", nil)
 	_, _ = rw.Write(response)
 }
 
@@ -107,21 +107,58 @@ func handleJobList(rw http.ResponseWriter, rq *http.Request) {
 	if err != nil {
 		goto ERR
 	}
-	newResponse, err = common.NewResponse(1,"success",list)
+	newResponse, err = common.NewResponse(1, "success", list)
 	if err != nil {
 		goto ERR
 	}
 	rw.Write(newResponse)
-	ERR:
-		newResponse, _ = common.NewResponse(0,"error",nil)
+ERR:
+	newResponse, _ = common.NewResponse(0, "error", nil)
 	rw.Write(newResponse)
 }
 
+func handleJobKill(rw http.ResponseWriter, rq *http.Request) {
+	var (
+		readAll  []byte
+		job      common.Job
+		response []byte
+	)
+	defer rq.Body.Close()
+
+	err := rq.ParseForm()
+	if err != nil {
+		goto ERR
+	}
+	readAll, err = ioutil.ReadAll(rq.Body)
+	if err != nil {
+		goto ERR
+	}
+	err = json.Unmarshal(readAll, &job)
+	if err != nil {
+		goto ERR
+	}
+	err = jobManager.G_jobMgr.KillJob(job.Name)
+	if err != nil {
+		goto ERR
+	}
+	response, err = common.NewResponse(1, "success", "")
+	if err != nil {
+		goto ERR
+	}
+	_, _ = rw.Write(response)
+	return
+ERR:
+	response, _ = common.NewResponse(1, "error", nil)
+	_, _ = rw.Write(response)
+}
+
 func InitApiServer() (err error) {
+	//配置路由
 	mux := http.NewServeMux()
 	mux.HandleFunc("/job/save", handleJobSave)
 	mux.HandleFunc("/job/delete", handleJobDelete)
 	mux.HandleFunc("/job/list", handleJobList)
+	mux.HandleFunc("/job/kill", handleJobKill)
 
 	//启动http监听
 	listen, err := net.Listen("tcp", ":"+strconv.Itoa(config.G_Config.ApiPort))

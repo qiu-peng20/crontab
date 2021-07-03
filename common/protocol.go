@@ -11,12 +11,12 @@ type Job struct {
 
 // Response 接口返回策略
 type Response struct {
-	ErrCode int `json:"errCode"`
-	Message string `json:"message"`
-	Data interface{} `json:"data"`
+	ErrCode int         `json:"errCode"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
 }
 
-func NewResponse(errCode int, message string, data interface{}) ([]byte, error)  {
+func NewResponse(errCode int, message string, data interface{}) ([]byte, error) {
 	var response Response
 	response.ErrCode = errCode
 	response.Message = message
@@ -26,5 +26,14 @@ func NewResponse(errCode int, message string, data interface{}) ([]byte, error) 
 	if err != nil {
 		return nil, err
 	}
-	return marshal,nil
+	return marshal, nil
+}
+
+func JsonParseJob(data []byte) (*Job, error) {
+	var job Job
+	err := json.Unmarshal(data, &job)
+	if err != nil {
+		return &job, err
+	}
+	return &job, nil
 }

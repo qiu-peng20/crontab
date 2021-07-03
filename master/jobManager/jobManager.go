@@ -116,3 +116,22 @@ func (j JobMgr)FindList()(list []common.Job, err error)  {
 	}
 	return
 }
+
+func (j JobMgr)KillJob(name string) (err error)  {
+	var (
+		grantResponse  *clientv3.LeaseGrantResponse
+	)
+
+	jobName := common.JobKillUrl + name
+	fmt.Print(jobName)
+	grantResponse, err = j.Lease.Grant(context.TODO(),1)
+	if err != nil {
+		return err
+	}
+	leaseID := grantResponse.ID
+	_, err = j.Kv.Put(context.TODO(),jobName,"",clientv3.WithLease(leaseID))
+	if err != nil {
+		return err
+	}
+	return
+}
