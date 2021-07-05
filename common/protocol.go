@@ -1,6 +1,9 @@
 package common
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"strings"
+)
 
 // Job 定时任务
 type Job struct {
@@ -36,4 +39,22 @@ func JsonParseJob(data []byte) (*Job, error) {
 		return &job, err
 	}
 	return &job, nil
+}
+
+func FindKey(s string) (str string) {
+	str = strings.TrimPrefix(s, JobSaveUrl)
+	return
+}
+
+type JobEvent struct {
+	EventType int
+	Job       *Job
+}
+
+func BuildJobEvent(Event int, j *Job) *JobEvent {
+	jobE := &JobEvent{
+		EventType: Event,
+		Job:       j,
+	}
+	return jobE
 }

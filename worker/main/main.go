@@ -3,6 +3,7 @@ package main
 import (
 	"crontab/worker/config"
 	"crontab/worker/jobManager"
+	"crontab/worker/schedule"
 	"flag"
 	"fmt"
 	"runtime"
@@ -23,6 +24,7 @@ func init()  {
 		return
 	}
 	runtime.GOMAXPROCS(runtime.NumCPU())
+	schedule.InitSchedule()
 }
 
 func main()  {
