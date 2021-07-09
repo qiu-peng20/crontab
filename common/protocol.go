@@ -84,3 +84,17 @@ func BuildJobSchedulePlan(j *Job) (jsp *JobSchedulePlan, err error) {
 	}
 	return
 }
+
+type JobScheduleExecuting struct {
+	Job *Job
+	PlanTime time.Time
+	ExecutingTime time.Time
+}
+
+func BuildJobExecuting(jp *JobSchedulePlan) (je *JobScheduleExecuting)  {
+	return &JobScheduleExecuting{
+		Job: jp.Job,
+		PlanTime: jp.NextTime,
+		ExecutingTime: time.Now(),
+	}
+}

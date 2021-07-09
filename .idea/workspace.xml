@@ -4,8 +4,6 @@
     <list default="true" id="b85e0cca-fb4a-440b-a8d5-9df25238bfac" name="默认更改列表" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/protocol.go" beforeDir="false" afterPath="$PROJECT_DIR$/common/protocol.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/worker/schedule/schedule.go" beforeDir="false" afterPath="$PROJECT_DIR$/worker/schedule/schedule.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
