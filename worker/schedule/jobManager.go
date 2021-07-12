@@ -1,11 +1,9 @@
-package jobManager
+package schedule
 
 import (
 	"context"
 	"crontab/common"
 	config2 "crontab/worker/config"
-	"crontab/worker/schedule"
-	"fmt"
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/mvcc/mvccpb"
 	"time"
@@ -73,7 +71,8 @@ func (j JobMgr) WatchJob() (err error) {
 			return err
 		}
 		//TODO：把JOB同步给任务调度携程
-		fmt.Print(job)
+		eventJob = common.BuildJobEvent(common.SaveJob, job)
+		G_JobSchedule.PushSchedule(eventJob)
 	}
 
 	//监听后续的变化
@@ -97,10 +96,16 @@ func (j JobMgr) WatchJob() (err error) {
 						Name: b,
 					})
 				}
-				schedule.G_JobSchedule.PushSchedule(eventJob)
+				G_JobSchedule.PushSchedule(eventJob)
 				//推给schedule
 			}
 		}
 	}()
 	return
 }
+
+func (j JobMgr) CreateLock(name string) (lock *JobLock) {
+	lock = InitJobLock(j.Kv,j.Lease,name)
+	return
+}
+

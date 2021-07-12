@@ -11,6 +11,7 @@ type JobSchedule struct {
 	ScheduleChan chan *common.JobEvent //ETCD任务队列
 	SchedulePlan map[string]*common.JobSchedulePlan  //任务调度计划
 	JobExecutingTable map[string]*common.JobScheduleExecuting  //任务执行计划
+	JobExecutingChan chan *common.JobExecutorResult
 }
 
 var G_JobSchedule *JobSchedule
@@ -19,6 +20,7 @@ var G_JobSchedule *JobSchedule
 func (j *JobSchedule) scheduleLoop() {
 	var (
 		jobEvent *common.JobEvent
+		jobResult *common.JobExecutorResult
 	)
 	//初始化任务调度器
 	scheduleAfter :=  j.CheckSchedule()
@@ -28,11 +30,19 @@ func (j *JobSchedule) scheduleLoop() {
 		case jobEvent = <-j.ScheduleChan:
 			j.handleSchedule(jobEvent)
 		case <-timer.C: //最近任务到期
-
+		case jobResult = <- j.JobExecutingChan  : //监听任务执行结果
+			j.handleJobResult(jobResult)
 		}
+
 		scheduleAfter = j.CheckSchedule()
 		timer.Reset(scheduleAfter) //重制调度间隔
 	}
+}
+
+// 处理任务执行结果
+func (j *JobSchedule) handleJobResult(jr *common.JobExecutorResult)  {
+	delete(j.JobExecutingTable,jr.JSE.Job.Name)
+	fmt.Println("这里是任务执行结果",string(jr.OutPut))
 }
 
 //处理调度任务
@@ -101,8 +111,9 @@ func (j *JobSchedule) tryJob(jp *common.JobSchedulePlan) {
 	jobScheduleExecuting = common.BuildJobExecuting(jp)
 	//保存执行任务
 	j.JobExecutingTable[jp.Job.Name] = jobScheduleExecuting
-	//TODO:执行任务:
+	//执行任务
 	fmt.Println("执行任务",j.JobExecutingTable[jp.Job.Name].ExecutingTime,j.JobExecutingTable[jp.Job.Name].PlanTime)
+	G_executor.ExecuteJob(jobScheduleExecuting)
 }
 
 func (j *JobSchedule) PushSchedule(jobEvent *common.JobEvent) {
@@ -115,6 +126,11 @@ func InitSchedule() {
 		ScheduleChan: make(chan *common.JobEvent, 1000),
 		SchedulePlan: make(map[string]*common.JobSchedulePlan),
 		JobExecutingTable: make(map[string]*common.JobScheduleExecuting),
+		JobExecutingChan: make(chan *common.JobExecutorResult,1000),
 	}
 	go G_JobSchedule.scheduleLoop()
+}
+
+func (j *JobSchedule)PushResult(result *common.JobExecutorResult)  {
+	j.JobExecutingChan <- result
 }

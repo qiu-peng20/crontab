@@ -98,3 +98,11 @@ func BuildJobExecuting(jp *JobSchedulePlan) (je *JobScheduleExecuting)  {
 		ExecutingTime: time.Now(),
 	}
 }
+
+type JobExecutorResult struct {
+	JSE *JobScheduleExecuting
+	OutPut []byte //shell执行命令
+	Err error
+	StartTime time.Time //开始时间
+	EndTime time.Time //结束时间
+}
