@@ -8,10 +8,10 @@ import (
 
 // JobSchedule 任务调度
 type JobSchedule struct {
-	ScheduleChan chan *common.JobEvent //ETCD任务队列
-	SchedulePlan map[string]*common.JobSchedulePlan  //任务调度计划
-	JobExecutingTable map[string]*common.JobScheduleExecuting  //任务执行计划
-	JobExecutingChan chan *common.JobExecutorResult
+	ScheduleChan      chan *common.JobEvent                   //ETCD任务队列
+	SchedulePlan      map[string]*common.JobSchedulePlan      //任务调度计划
+	JobExecutingTable map[string]*common.JobScheduleExecuting //任务执行计划
+	JobExecutingChan  chan *common.JobExecutorResult
 }
 
 var G_JobSchedule *JobSchedule
@@ -19,18 +19,18 @@ var G_JobSchedule *JobSchedule
 //取出任务进行执行
 func (j *JobSchedule) scheduleLoop() {
 	var (
-		jobEvent *common.JobEvent
+		jobEvent  *common.JobEvent
 		jobResult *common.JobExecutorResult
 	)
 	//初始化任务调度器
-	scheduleAfter :=  j.CheckSchedule()
+	scheduleAfter := j.CheckSchedule()
 	timer := time.NewTimer(scheduleAfter)
 	for {
 		select {
 		case jobEvent = <-j.ScheduleChan:
 			j.handleSchedule(jobEvent)
 		case <-timer.C: //最近任务到期
-		case jobResult = <- j.JobExecutingChan  : //监听任务执行结果
+		case jobResult = <-j.JobExecutingChan: //监听任务执行结果
 			j.handleJobResult(jobResult)
 		}
 
@@ -40,9 +40,8 @@ func (j *JobSchedule) scheduleLoop() {
 }
 
 // 处理任务执行结果
-func (j *JobSchedule) handleJobResult(jr *common.JobExecutorResult)  {
-	delete(j.JobExecutingTable,jr.JSE.Job.Name)
-	fmt.Println("这里是任务执行结果",string(jr.OutPut))
+func (j *JobSchedule) handleJobResult(jr *common.JobExecutorResult) {
+	delete(j.JobExecutingTable, jr.JSE.Job.Name)
 }
 
 //处理调度任务
@@ -50,7 +49,8 @@ func (j *JobSchedule) handleSchedule(jobE *common.JobEvent) {
 	var (
 		err          error
 		schedulePlan *common.JobSchedulePlan
-		jobBool bool
+		jobBool      bool
+		jobExecuting *common.JobScheduleExecuting
 	)
 	switch jobE.EventType {
 	case common.SaveJob:
@@ -60,17 +60,22 @@ func (j *JobSchedule) handleSchedule(jobE *common.JobEvent) {
 		}
 		j.SchedulePlan[schedulePlan.Job.Name] = schedulePlan
 	case common.DeleteJob:
-		if schedulePlan,jobBool = j.SchedulePlan[jobE.Job.Name];jobBool {
-			delete(j.SchedulePlan,schedulePlan.Job.Name)
+		if schedulePlan, jobBool = j.SchedulePlan[jobE.Job.Name]; jobBool {
+			delete(j.SchedulePlan, schedulePlan.Job.Name)
+		}
+	case common.KillJob:
+		if jobExecuting, jobBool = j.JobExecutingTable[jobE.Job.Name]; jobBool {
+			jobExecuting.Cancel() //杀死shell进程
 		}
 	}
+
 }
 
 // CheckSchedule 遍历需要执行的任务
 func (j *JobSchedule) CheckSchedule() (scheduleAfter time.Duration) {
 	var (
 		jobSchedulePlan *common.JobSchedulePlan
-		nearTime *time.Time
+		nearTime        *time.Time
 	)
 	nowTime := time.Now() // 当前时间
 
@@ -81,7 +86,7 @@ func (j *JobSchedule) CheckSchedule() (scheduleAfter time.Duration) {
 	}
 
 	//1. 遍历所有的执行任务
-	for _,jobSchedulePlan = range j.SchedulePlan {
+	for _, jobSchedulePlan = range j.SchedulePlan {
 		//2. 到期的任务立即执行
 		if jobSchedulePlan.NextTime.Equal(nowTime) || jobSchedulePlan.NextTime.Before(nowTime) {
 			//TODO:尝试执行任务
@@ -100,7 +105,7 @@ func (j *JobSchedule) CheckSchedule() (scheduleAfter time.Duration) {
 func (j *JobSchedule) tryJob(jp *common.JobSchedulePlan) {
 	//调度和任务执行
 	var (
-		jobBool bool
+		jobBool              bool
 		jobScheduleExecuting *common.JobScheduleExecuting
 	)
 	if jobScheduleExecuting, jobBool = j.JobExecutingTable[jp.Job.Name]; jobBool {
@@ -112,7 +117,6 @@ func (j *JobSchedule) tryJob(jp *common.JobSchedulePlan) {
 	//保存执行任务
 	j.JobExecutingTable[jp.Job.Name] = jobScheduleExecuting
 	//执行任务
-	fmt.Println("执行任务",j.JobExecutingTable[jp.Job.Name].ExecutingTime,j.JobExecutingTable[jp.Job.Name].PlanTime)
 	G_executor.ExecuteJob(jobScheduleExecuting)
 }
 
@@ -123,14 +127,14 @@ func (j *JobSchedule) PushSchedule(jobEvent *common.JobEvent) {
 // InitSchedule 初始化一个任务调度器
 func InitSchedule() {
 	G_JobSchedule = &JobSchedule{
-		ScheduleChan: make(chan *common.JobEvent, 1000),
-		SchedulePlan: make(map[string]*common.JobSchedulePlan),
+		ScheduleChan:      make(chan *common.JobEvent, 1000),
+		SchedulePlan:      make(map[string]*common.JobSchedulePlan),
 		JobExecutingTable: make(map[string]*common.JobScheduleExecuting),
-		JobExecutingChan: make(chan *common.JobExecutorResult,1000),
+		JobExecutingChan:  make(chan *common.JobExecutorResult, 1000),
 	}
 	go G_JobSchedule.scheduleLoop()
 }
 
-func (j *JobSchedule)PushResult(result *common.JobExecutorResult)  {
+func (j *JobSchedule) PushResult(result *common.JobExecutorResult) {
 	j.JobExecutingChan <- result
 }

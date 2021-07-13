@@ -32,6 +32,7 @@ require (
 	github.com/klauspost/compress v1.11.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.4 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/tdewolff/minify/v2 v2.9.13 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.2.0 // indirect

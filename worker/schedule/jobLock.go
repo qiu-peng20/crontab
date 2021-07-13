@@ -13,6 +13,9 @@ type JobLock struct {
 	Lease clientv3.Lease
 
 	JobName string
+	LeaseId clientv3.LeaseID
+	Cancel  context.CancelFunc
+	LockBool bool
 }
 
 // InitJobLock 初始化一个锁
@@ -33,7 +36,7 @@ func (jl *JobLock) TryLock() (err error) {
 		keepAlive <-chan *clientv3.LeaseKeepAliveResponse
 		txn       clientv3.Txn
 		lockName  string
-		commit *clientv3.TxnResponse
+		commit    *clientv3.TxnResponse
 	)
 	//1.创建租约
 	grant, err = jl.Lease.Grant(context.TODO(), 5)
@@ -84,12 +87,22 @@ func (jl *JobLock) TryLock() (err error) {
 
 	//走then -> success，else -> !success
 	if !commit.Succeeded {
-		fmt.Println()
+		err = common.Lock_failure
+		goto FALL
 	}
-	
+	jl.LeaseId = leaseId
+	jl.Cancel = cancel
+	jl.LockBool = true
 	return
 FALL:
 	cancel()
 	jl.Lease.Revoke(context.TODO(), leaseId)
 	return
+}
+
+func (jl *JobLock)RemoveLock()  {
+	if jl.LockBool {
+		jl.Cancel()
+		jl.Lease.Revoke(context.TODO(),jl.LeaseId)
+	}
 }

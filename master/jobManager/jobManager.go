@@ -123,7 +123,6 @@ func (j JobMgr)KillJob(name string) (err error)  {
 	)
 
 	jobName := common.JobKillUrl + name
-	fmt.Print(jobName)
 	grantResponse, err = j.Lease.Grant(context.TODO(),1)
 	if err != nil {
 		return err

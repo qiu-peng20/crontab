@@ -1,6 +1,7 @@
 package common
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/gorhill/cronexpr"
 	"strings"
@@ -55,6 +56,11 @@ func FindKey(s string) (str string) {
 	return
 }
 
+func FindKillKey(s string) (str string) {
+	str = strings.TrimPrefix(s, JobKillUrl)
+	return
+}
+
 type JobEvent struct {
 	EventType int
 	Job       *Job
@@ -78,31 +84,36 @@ func BuildJobSchedulePlan(j *Job) (jsp *JobSchedulePlan, err error) {
 		return &JobSchedulePlan{}, err
 	}
 	jsp = &JobSchedulePlan{
-		Job: j,
-		Expr: parse,
+		Job:      j,
+		Expr:     parse,
 		NextTime: parse.Next(time.Now()),
 	}
 	return
 }
 
 type JobScheduleExecuting struct {
-	Job *Job
-	PlanTime time.Time
+	Job           *Job
+	PlanTime      time.Time
 	ExecutingTime time.Time
+	Ctx           context.Context
+	Cancel        context.CancelFunc //用于取消任务的时候用
 }
 
-func BuildJobExecuting(jp *JobSchedulePlan) (je *JobScheduleExecuting)  {
+func BuildJobExecuting(jp *JobSchedulePlan) (je *JobScheduleExecuting) {
+	ctx,cancel := context.WithCancel(context.TODO())
 	return &JobScheduleExecuting{
-		Job: jp.Job,
-		PlanTime: jp.NextTime,
+		Job:           jp.Job,
+		PlanTime:      jp.NextTime,
 		ExecutingTime: time.Now(),
+		Ctx: ctx,
+		Cancel: cancel,
 	}
 }
 
 type JobExecutorResult struct {
-	JSE *JobScheduleExecuting
-	OutPut []byte //shell执行命令
-	Err error
+	JSE       *JobScheduleExecuting
+	OutPut    []byte //shell执行命令
+	Err       error
 	StartTime time.Time //开始时间
-	EndTime time.Time //结束时间
+	EndTime   time.Time //结束时间
 }

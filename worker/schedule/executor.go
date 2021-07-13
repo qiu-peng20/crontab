@@ -1,7 +1,6 @@
 package schedule
 
 import (
-	"context"
 	"crontab/common"
 	"os/exec"
 	"time"
@@ -20,6 +19,7 @@ func (e *Executor) ExecuteJob(job *common.JobScheduleExecuting) {
 	var (
 		cmd *exec.Cmd
 		result *common.JobExecutorResult
+		err error
 	)
 	go func() {
 		//初始化任务结果
@@ -29,22 +29,26 @@ func (e *Executor) ExecuteJob(job *common.JobScheduleExecuting) {
 		}
 		//首先获取分布式锁
 		lock := G_jobMgr.CreateLock(job.Job.Name)
-		err := lock.TryLock()
-		if err != nil {
-			return
-		}
 
 		//执行shell命令
 		result.StartTime = time.Now()
-		cmd = exec.CommandContext(context.TODO(), "/bin/bash", "-c", job.Job.Command)
+		err = lock.TryLock()
+		defer lock.RemoveLock()
+		if err != nil {
+			result.EndTime = time.Now()
+			return
+		}else {
+			result.StartTime = time.Now()
 
-		//获取shell命令
-		output, err := cmd.Output()
-		result.EndTime = time.Now()
-		result.OutPut = output
-		result.Err = err
+			cmd = exec.CommandContext(job.Ctx, "/bin/bash", "-c", job.Job.Command)
+			//获取shell命令
+			output, err := cmd.Output()
 
-		//将执行结果回传给schedule
+			result.EndTime = time.Now()
+			result.OutPut = output
+			result.Err = err
+			//将执行结果回传给schedule
+		}
 		G_JobSchedule.PushResult(result)
 	}()
 }

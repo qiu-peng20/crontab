@@ -49,6 +49,47 @@ func InitJobMgr() (err error) {
 	if err != nil {
 		return err
 	}
+	err = G_jobMgr.WatchKillJob()
+	if err != nil {
+		return err
+	}
+	return
+}
+
+// WatchKillJob 监听强杀任务
+func (j JobMgr) WatchKillJob() (err error) {
+	var (
+		getResponse *clientv3.GetResponse
+		watchChan   clientv3.WatchChan
+		eventJob *common.JobEvent
+	)
+	getResponse, err = j.Kv.Get(context.TODO(), common.JobKillUrl)
+	if err != nil {
+		return err
+	}
+	go func() {
+		revision := getResponse.Header.Revision + 1
+		//监听/cron/job/目录下的所有的事件
+		watchChan = j.Watcher.Watch(context.TODO(), common.JobSaveUrl, clientv3.WithRev(revision), clientv3.WithPrefix())
+		//处理监听事件
+		for watchResponse := range watchChan {
+			for _, watchEvent := range watchResponse.Events {
+				switch watchEvent.Type {
+				case mvccpb.PUT:
+					//任务保存事件
+					str := common.FindKillKey(string(watchEvent.Kv.Value))
+					//生成调度计划
+					eventJob = common.BuildJobEvent(common.SaveJob, &common.Job{
+						Name: str,
+					})
+				case mvccpb.DELETE:
+					//任务删除事件
+				}
+				G_JobSchedule.PushSchedule(eventJob)
+				//推给schedule
+			}
+		}
+	}()
 	return
 }
 
@@ -105,7 +146,6 @@ func (j JobMgr) WatchJob() (err error) {
 }
 
 func (j JobMgr) CreateLock(name string) (lock *JobLock) {
-	lock = InitJobLock(j.Kv,j.Lease,name)
+	lock = InitJobLock(j.Kv, j.Lease, name)
 	return
 }
-
