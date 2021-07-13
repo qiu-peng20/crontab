@@ -2,6 +2,8 @@ package schedule
 
 import (
 	"context"
+	"crontab/common"
+	"fmt"
 	"github.com/coreos/etcd/clientv3"
 )
 
@@ -29,6 +31,9 @@ func (jl *JobLock) TryLock() (err error) {
 		ctx       context.Context
 		cancel    context.CancelFunc
 		keepAlive <-chan *clientv3.LeaseKeepAliveResponse
+		txn       clientv3.Txn
+		lockName  string
+		commit *clientv3.TxnResponse
 	)
 	//1.创建租约
 	grant, err = jl.Lease.Grant(context.TODO(), 5)
@@ -39,6 +44,11 @@ func (jl *JobLock) TryLock() (err error) {
 	//2.自动续租
 	//2.1  创建context，用于取消续租
 	ctx, cancel = context.WithCancel(context.TODO())
+	//释放租约
+	defer func() {
+		cancel()                                 //取消自动续租
+		jl.Lease.Revoke(context.TODO(), leaseId) //释放租约
+	}()
 	//2.2 续租开始
 	keepAlive, err = jl.Lease.KeepAlive(ctx, leaseId)
 	if err != nil {
@@ -46,23 +56,40 @@ func (jl *JobLock) TryLock() (err error) {
 	}
 	//2.3 处理续租的携程
 	go func() {
-		for  {
+		for {
 			select {
 			case alive := <-keepAlive: //自动应答
-			if alive == nil {  //如果续租失败则为空
-				goto END
-			}
-
+				if alive == nil { //如果续租失败则为空
+					goto END
+				} else {
+					fmt.Println("自动续租成功", alive.ID)
+				}
 			}
 		}
-		END:
+	END:
 	}()
 	//3.创建事务 TXN
+	txn = jl.Kv.Txn(context.TODO())
+	//设置锁路径
+	lockName = common.JobLockUrl + jl.JobName
+	//事务抢锁
+	txn.If(clientv3.Compare(clientv3.CreateRevision(lockName), "=", 0)).
+		Then(clientv3.OpPut(lockName, "", clientv3.WithLease(leaseId))).
+		Else(clientv3.OpGet(lockName))
 
-	//4.抢锁
-	//5.成功则返回，失败释放租约
-	FALL:
-		cancel()//取消自动续租
-	jl.Lease.Revoke(context.TODO(),leaseId) //释放租约
+	// 提交事物
+	if commit, err = txn.Commit(); err != nil {
+		goto FALL
+	}
+
+	//走then -> success，else -> !success
+	if !commit.Succeeded {
+		fmt.Println()
+	}
+	
+	return
+FALL:
+	cancel()
+	jl.Lease.Revoke(context.TODO(), leaseId)
 	return
 }
