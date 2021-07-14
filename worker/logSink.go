@@ -33,7 +33,9 @@ func (l *LogSink) WriteLog() {
 				logs = make([]interface{},0)
 			}
 			logs = append(logs,log)
-			
+			if len(logs) > 100 {
+				
+			}
 		}
 	}
 }

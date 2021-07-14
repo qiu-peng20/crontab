@@ -2,15 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b85e0cca-fb4a-440b-a8d5-9df25238bfac" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/worker/logSink.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/worker/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/config/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/worker/config/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/main/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/worker/main/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/schedule/executor.go" beforeDir="false" afterPath="$PROJECT_DIR$/worker/executor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/schedule/jobLock.go" beforeDir="false" afterPath="$PROJECT_DIR$/worker/jobLock.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/schedule/jobManager.go" beforeDir="false" afterPath="$PROJECT_DIR$/worker/jobManager.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/worker/schedule/schedule.go" beforeDir="false" afterPath="$PROJECT_DIR$/worker/schedule.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/worker/logSink.go" beforeDir="false" afterPath="$PROJECT_DIR$/worker/logSink.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
