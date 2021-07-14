@@ -1,8 +1,8 @@
 package main
 
 import (
+	"crontab/worker"
 	"crontab/worker/config"
-	"crontab/worker/schedule"
 	"flag"
 	"fmt"
 	"runtime"
@@ -22,18 +22,18 @@ func init() {
 	if err != nil {
 		goto ERR
 	}
-	schedule.InitExecutor() //初始化执行器
+	worker.InitExecutor() //初始化执行器
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	schedule.InitSchedule() //初始化调度器
+	worker.InitSchedule() //初始化调度器
 
 ERR:
 	fmt.Print(err)
 }
 
 func main() {
-	err := schedule.InitJobMgr() //初始化api服务
+	err := worker.InitJobMgr() //初始化api服务
 	if err != nil {
 		fmt.Print(err)
 		goto ERR

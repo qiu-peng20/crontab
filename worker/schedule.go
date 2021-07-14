@@ -1,4 +1,4 @@
-package schedule
+package worker
 
 import (
 	"crontab/common"
@@ -41,10 +41,11 @@ func (j *JobSchedule) scheduleLoop() {
 
 // 处理任务执行结果
 func (j *JobSchedule) handleJobResult(jr *common.JobExecutorResult) {
+	var jobLog *common.JobLog
 	delete(j.JobExecutingTable, jr.JSE.Job.Name)
-
+	jobLog = &common.JobLog{}
 	if jr.Err != common.Lock_failure {
-		jobLog := &common.JobLog{
+		jobLog = &common.JobLog{
 			JobName: jr.JSE.Job.Name,
 			Common: jr.JSE.Job.Command,
 			OutPut: string(jr.OutPut),
@@ -53,6 +54,9 @@ func (j *JobSchedule) handleJobResult(jr *common.JobExecutorResult) {
 			StartTime: jr.StartTime.UnixNano() /1000 /1000,
 			EndTime: jr.EndTime.UnixNano() /1000 /1000,
 		}
+	}
+	if jr.Err != nil {
+		jobLog.Err = jr.Err.Error()
 	}
 	fmt.Println("任务执行完成:",jr.JSE.Job.Name,string(jr.OutPut))
 }

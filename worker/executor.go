@@ -1,4 +1,4 @@
-package schedule
+package worker
 
 import (
 	"crontab/common"

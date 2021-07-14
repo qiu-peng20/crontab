@@ -1,4 +1,6 @@
 {
   "etcdEndPoints": ["127.0.0.1:2379"],
-  "etcdDialTimeOut": 5000
+  "etcdDialTimeOut": 5000,
+  "mongoUrl": "mongodb://localhost:27017",
+  "mongoTime": 5000
 }

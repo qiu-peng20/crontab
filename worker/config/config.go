@@ -8,6 +8,8 @@ import (
 type configData struct {
 	EtcdEndPoints []string `json:"etcdEndPoints"`
 	EtcdDialTimeOut int `json:"etcdDialTimeOut"`
+	MongoUrl string `json:"mongoUrl"`
+	MongoTime int `json:"mongoTime"`
 }
 
 var G_Config *configData
