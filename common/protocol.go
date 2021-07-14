@@ -100,13 +100,13 @@ type JobScheduleExecuting struct {
 }
 
 func BuildJobExecuting(jp *JobSchedulePlan) (je *JobScheduleExecuting) {
-	ctx,cancel := context.WithCancel(context.TODO())
+	ctx, cancel := context.WithCancel(context.TODO())
 	return &JobScheduleExecuting{
 		Job:           jp.Job,
 		PlanTime:      jp.NextTime,
 		ExecutingTime: time.Now(),
-		Ctx: ctx,
-		Cancel: cancel,
+		Ctx:           ctx,
+		Cancel:        cancel,
 	}
 }
 
@@ -116,4 +116,16 @@ type JobExecutorResult struct {
 	Err       error
 	StartTime time.Time //开始时间
 	EndTime   time.Time //结束时间
+}
+
+// JobLog MongoDB数据结构
+type JobLog struct {
+	JobName      string `bson:"job_name"`      //任务执行名字
+	Common       string `bson:"common"`        //Shell命令
+	Err          string `bson:"err"`           //错误内容
+	OutPut       string `bson:"out_put"`       //任务执行结果
+	PlanTime     int64  `bson:"plan_time"`     //计划开始时间
+	ScheduleTime int64  `bson:"schedule_time"` //实际调度时间
+	StartTime    int64  `bson:"start_time"`    //任务开始时间
+	EndTime      int64  `bson:"end_time"`      //任务结束时间
 }

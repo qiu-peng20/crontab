@@ -44,14 +44,10 @@ func (jl *JobLock) TryLock() (err error) {
 		return err
 	}
 	leaseId := grant.ID
+
 	//2.自动续租
 	//2.1  创建context，用于取消续租
 	ctx, cancel = context.WithCancel(context.TODO())
-	//释放租约
-	defer func() {
-		cancel()                                 //取消自动续租
-		jl.Lease.Revoke(context.TODO(), leaseId) //释放租约
-	}()
 	//2.2 续租开始
 	keepAlive, err = jl.Lease.KeepAlive(ctx, leaseId)
 	if err != nil {
@@ -70,6 +66,7 @@ func (jl *JobLock) TryLock() (err error) {
 			}
 		}
 	END:
+		fmt.Println("续租失败")
 	}()
 	//3.创建事务 TXN
 	txn = jl.Kv.Txn(context.TODO())
@@ -102,6 +99,7 @@ FALL:
 
 func (jl *JobLock)RemoveLock()  {
 	if jl.LockBool {
+		fmt.Println("取消锁")
 		jl.Cancel()
 		jl.Lease.Revoke(context.TODO(),jl.LeaseId)
 	}

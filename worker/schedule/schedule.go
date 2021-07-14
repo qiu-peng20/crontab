@@ -42,6 +42,19 @@ func (j *JobSchedule) scheduleLoop() {
 // 处理任务执行结果
 func (j *JobSchedule) handleJobResult(jr *common.JobExecutorResult) {
 	delete(j.JobExecutingTable, jr.JSE.Job.Name)
+
+	if jr.Err != common.Lock_failure {
+		jobLog := &common.JobLog{
+			JobName: jr.JSE.Job.Name,
+			Common: jr.JSE.Job.Command,
+			OutPut: string(jr.OutPut),
+			PlanTime: jr.JSE.PlanTime.UnixNano() / 1000 / 1000,
+			ScheduleTime: jr.JSE.ExecutingTime.UnixNano() /1000 /1000 ,
+			StartTime: jr.StartTime.UnixNano() /1000 /1000,
+			EndTime: jr.EndTime.UnixNano() /1000 /1000,
+		}
+	}
+	fmt.Println("任务执行完成:",jr.JSE.Job.Name,string(jr.OutPut))
 }
 
 //处理调度任务
@@ -65,10 +78,10 @@ func (j *JobSchedule) handleSchedule(jobE *common.JobEvent) {
 		}
 	case common.KillJob:
 		if jobExecuting, jobBool = j.JobExecutingTable[jobE.Job.Name]; jobBool {
+			fmt.Println("任务被杀死")
 			jobExecuting.Cancel() //杀死shell进程
 		}
 	}
-
 }
 
 // CheckSchedule 遍历需要执行的任务

@@ -59,18 +59,12 @@ func InitJobMgr() (err error) {
 // WatchKillJob 监听强杀任务
 func (j JobMgr) WatchKillJob() (err error) {
 	var (
-		getResponse *clientv3.GetResponse
 		watchChan   clientv3.WatchChan
 		eventJob *common.JobEvent
 	)
-	getResponse, err = j.Kv.Get(context.TODO(), common.JobKillUrl)
-	if err != nil {
-		return err
-	}
 	go func() {
-		revision := getResponse.Header.Revision + 1
 		//监听/cron/job/目录下的所有的事件
-		watchChan = j.Watcher.Watch(context.TODO(), common.JobSaveUrl, clientv3.WithRev(revision), clientv3.WithPrefix())
+		watchChan = j.Watcher.Watch(context.TODO(), common.JobKillUrl, clientv3.WithPrefix())
 		//处理监听事件
 		for watchResponse := range watchChan {
 			for _, watchEvent := range watchResponse.Events {
@@ -79,7 +73,7 @@ func (j JobMgr) WatchKillJob() (err error) {
 					//任务保存事件
 					str := common.FindKillKey(string(watchEvent.Kv.Value))
 					//生成调度计划
-					eventJob = common.BuildJobEvent(common.SaveJob, &common.Job{
+					eventJob = common.BuildJobEvent(common.KillJob, &common.Job{
 						Name: str,
 					})
 				case mvccpb.DELETE:
