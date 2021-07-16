@@ -58,6 +58,7 @@ func (j *JobSchedule) handleJobResult(jr *common.JobExecutorResult) {
 	if jr.Err != nil {
 		jobLog.Err = jr.Err.Error()
 	}
+	G_logSink.AppendData(jobLog)
 	fmt.Println("任务执行完成:",jr.JSE.Job.Name,string(jr.OutPut))
 }
 

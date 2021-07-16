@@ -129,3 +129,7 @@ type JobLog struct {
 	StartTime    int64  `bson:"start_time"`    //任务开始时间
 	EndTime      int64  `bson:"end_time"`      //任务结束时间
 }
+
+type LogBash struct {
+	Logs [] interface{}
+}

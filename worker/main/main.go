@@ -22,11 +22,21 @@ func init() {
 	if err != nil {
 		goto ERR
 	}
+	err = worker.InitLogSink()
+	if err != nil {
+		goto ERR
+	}
+
 	worker.InitExecutor() //初始化执行器
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	worker.InitSchedule() //初始化调度器
+
+	err = worker.InitLogSink()
+	if err != nil {
+		goto ERR
+	}
 
 ERR:
 	fmt.Print(err)
