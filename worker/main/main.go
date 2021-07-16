@@ -22,7 +22,13 @@ func init() {
 	if err != nil {
 		goto ERR
 	}
-	err = worker.InitLogSink()
+
+	err = worker.InitRegister() //初始化ip
+	if err != nil {
+		return
+	}
+
+	err = worker.InitLogSink() //初始化日志
 	if err != nil {
 		goto ERR
 	}
